@@ -1,9 +1,10 @@
 """Samsara Loop Web Dashboard"""
+import os
 from flask import Flask, jsonify, request
 from samsara_loop.core import LoopEngine
 
 app = Flask(__name__)
-AGENT_ID = "default"
+AGENT_ID = os.environ.get("SAMSARA_AGENT_ID", "default")
 
 @app.route("/")
 def dashboard():
