@@ -99,10 +99,15 @@ h3{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.06em;margi
 @app.route("/approve", methods=["POST"])
 def approve_test():
     tid = request.json.get("test_id")
-    if tid:
-        LoopEngine(AGENT_ID).approve_test(tid)
-        return jsonify({"status":"approved"})
-    return jsonify({"error":"no test_id"}), 400
+    if not tid:
+        return jsonify({"error": "no test_id"}), 400
+    # Check the test exists before approving
+    from samsara_loop.db import database as db
+    test = db.get_test_case(tid)
+    if not test:
+        return jsonify({"error": f"test_id '{tid}' not found"}), 404
+    LoopEngine(AGENT_ID).approve_test(tid)
+    return jsonify({"status": "approved"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
