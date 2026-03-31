@@ -18,7 +18,9 @@ def get_db():
     db_path = os.environ.get("SAMSARA_DB", DB_PATH)
     if isinstance(db_path, str):
         db_path = os.path.expanduser(os.path.expandvars(db_path))
-    conn = sqlite3.connect(db_path)
+    # Support shared in-memory URIs (e.g. file::memory:?cache=shared)
+    uri = db_path.startswith("file::") or db_path.startswith("memory:")
+    conn = sqlite3.connect(db_path, uri=uri)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -247,6 +249,19 @@ def get_test_cases(agent_id: str, status: Optional[str] = None) -> List[Dict]:
                 (agent_id,)
             )
         return [dict(r) for r in cur.fetchall()]
+
+
+
+def get_test_case(test_case_id: str) -> Optional[Dict]:
+    """Get a single test case by ID, or None if not found."""
+    conn = get_db()
+    row = conn.execute(
+        "SELECT * FROM test_cases WHERE id = ?", (test_case_id,)
+    ).fetchone()
+    conn.close()
+    if not row:
+        return None
+    return dict(row)
 
 
 def approve_test_case(test_case_id: str) -> None:
