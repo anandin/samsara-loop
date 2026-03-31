@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.py", "use": "@vercel/python" },
+    { "src": "static/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/run", "dest": "/api/run" },
+    { "src": "/api/eval", "dest": "/api/eval" },
+    { "src": "/api/profile", "dest": "/api/profile" },
+    { "src": "/api/approve", "dest": "/api/approve" },
+    { "src": "/api/approve/", "dest": "/api/approve" },
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/static/index.html" }
+  ]
+}
